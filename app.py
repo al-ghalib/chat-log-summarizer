@@ -2,24 +2,11 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 from chatlog_generator import generate_conversation, PROMPT_BANK
-from summarizer.parser import parse_chat
-from summarizer.statistics import count_messages
-from summarizer.keywords import extract_keywords, tfidf_keywords
+from summarizer.summarizer import summarize_chat
 
 load_dotenv()
 
-def summarize_text(text, use_tfidf=False):
-    lines = text.strip().split("\n")
-    user_msgs, ai_msgs = parse_chat(lines)
-    total, user_count, ai_count = count_messages(user_msgs, ai_msgs)
-    all_msgs = user_msgs + ai_msgs
-    keywords = tfidf_keywords(all_msgs) if use_tfidf else extract_keywords(all_msgs)
-    return total, user_count, ai_count, keywords
-
-
-
-##-------------------------Streamlit UI----------------------------##
-
+# -----------------------------------Streamlit UI-----------------------------------
 st.title("🤖 AI Chat Log Summarizer")
 st.sidebar.header("Options")
 use_tfidf = st.sidebar.checkbox("Use TF-IDF", value=False)
@@ -32,14 +19,16 @@ if st.sidebar.button("🗑 Delete All Chat Logs"):
             deleted_files += 1
     st.sidebar.success(f"Deleted {deleted_files} chat log(s)")
 
+
+# Mode Selection
+if "mode" not in st.session_state:
+    st.session_state.mode = "Analyze Existing File"
+
 mode = st.sidebar.radio(
-    "Choose Mode:", ["Generate New Chat Logs", "Analyze Existing File"]
+    "Choose Mode:", ["Generate New Chat Logs", "Analyze Existing File"], index=1
 )
 
 text = ""
-
-
-# Mode Selection
 
 if mode == "Generate New Chat Logs":
     generate_count = st.sidebar.number_input(
@@ -59,6 +48,7 @@ if mode == "Generate New Chat Logs":
                 f"✅ {generate_count} chats generated. Showing: `{os.path.basename(last_file)}`"
             )
 
+
 elif mode == "Analyze Existing File":
     chat_files = sorted([f for f in os.listdir("chat_logs") if f.endswith(".txt")])
     if not chat_files:
@@ -72,31 +62,34 @@ elif mode == "Analyze Existing File":
                 text = f.read()
             st.success(f"Loaded file: `{selected_file}`")
 
-
-
-# ---------- Summary Output ----------
+# Summary Output
 if text:
-    st.text_area("📄 Chat Log", value=text, height=300)
+    st.subheader("📄 Chat Log")
+    st.code(text, language="text")
 
     analyze_btn = st.button("🔍 Analyze Chat")
 
     if analyze_btn:
         with st.spinner("Analyzing conversation..."):
-            total, user_count, ai_count, keywords = summarize_text(text, use_tfidf)
-            lines = text.strip().split("\n")
-            topic_line = lines[0]
-            if topic_line.lower().startswith("# topic:"):
-                main_topic = topic_line.replace("# Topic:", "").strip()
-            elif topic_line.lower().startswith("user:"):
-                main_topic = topic_line.replace("User:", "").strip().split("?")[0]
-            else:
-                main_topic = "a topic"
+
+            if mode == "Generate New Chat Logs":
+                tmp_file = "chat_logs/_temp_summary.txt"
+                with open(tmp_file, "w", encoding="utf-8") as f:
+                    f.write(text)
+                file_to_analyze = tmp_file
+
+            elif mode == "Analyze Existing File":
+                file_to_analyze = os.path.join("chat_logs", selected_file)
+
+            summary_data = summarize_chat(file_to_analyze, use_tfidf)
 
             st.subheader("📊 Summary")
             st.markdown(
                 f"""
-                - The conversation had **{total} exchanges**.  
-                - The user asked mainly about **{main_topic}**.  
-                - Top 5 most frequent keywords: {', '.join(keywords[:5])}.  
+                - File: `{os.path.basename(summary_data['file'])}`  
+                - The conversation had **{summary_data['total']} exchanges**  
+                - User messages: **{summary_data['user']}**, AI messages: **{summary_data['ai']}**  
+                - Topic: **{summary_data['topic']}**  
+                - Top 5 keywords: {', '.join(summary_data['keywords'][:5])}  
                 """
             )
