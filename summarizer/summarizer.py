@@ -12,10 +12,10 @@ def summarize_chat(file_path, use_tfidf=False):
     all_msgs = user_msgs + ai_msgs
     keywords = tfidf_keywords(all_msgs) if use_tfidf else extract_keywords(all_msgs)
 
-    summary = f"""
-        Summary of {file_path}:
-        - Total messages exchanged: {total}
-        - User messages: {user_count}, AI messages: {ai_count}
-        - Top keywords: {', '.join(keywords)}
-    """
-    print(summary)
+    return {
+        "file": file_path,
+        "total": total,
+        "user": user_count,
+        "ai": ai_count,
+        "keywords": keywords,
+    }
