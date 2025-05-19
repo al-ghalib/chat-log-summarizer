@@ -1,3 +1,5 @@
 scikit-learn
 nltk
 openai
+streamlit
+python-dotenv
