@@ -13,23 +13,21 @@ openai.api_base = "https://api.groq.com/openai/v1"
 
 def generate_topic_summary(chat_text: str, model="llama3-70b-8192") -> str:
     prompt = f"""
-Given the following conversation between a User and an AI, extract a short topic or title that best summarizes the main subject or purpose of the conversation.
+Analyze the following conversation between a User and an AI, and describe what the discussion is about in one sentence. Focus on the general purpose or theme of the interaction.
 
 Conversation:
 {chat_text}
 
-Return only the title/topic, without explanations.
+Return only one sentence that describes the nature of this conversation.
 """
-
     try:
         response = openai.ChatCompletion.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
             temperature=0.5,
-            max_tokens=30,
+            max_tokens=60,
         )
-        topic = response["choices"][0]["message"]["content"].strip()
-        return topic
+        return response["choices"][0]["message"]["content"].strip()
     except Exception as e:
         return f"[Topic Error: {str(e)}]"
 

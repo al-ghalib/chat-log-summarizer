@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 from dotenv import load_dotenv
-from chatlog_generator import generate_conversation, PROMPT_BANK
+from chatlog_generator import generate_conversation, PROMPT_BANK, get_next_chat_number
 from summarizer.summarizer import summarize_chat
 
 load_dotenv()
@@ -36,12 +36,25 @@ if mode == "Generate New Chat Logs":
     )
     generate_btn = st.sidebar.button("⚙️ Generate Chats")
 
+    # if generate_btn:
+    #     with st.spinner(f"Generating {generate_count} short chats..."):
+    #         last_file = ""
+    #         for i in range(1, generate_count + 1):
+    #             prompt = PROMPT_BANK[(i - 1) % len(PROMPT_BANK)]
+    #             last_file = generate_conversation(prompt=prompt, turns=2, chat_num=i)
+    #         with open(last_file, "r", encoding="utf-8") as f:
+    #             text = f.read()
+    #         st.success(
+    #             f"✅ {generate_count} chats generated. Showing: `{os.path.basename(last_file)}`"
+    #         )
+
     if generate_btn:
         with st.spinner(f"Generating {generate_count} short chats..."):
+            start_index = get_next_chat_number()
             last_file = ""
-            for i in range(1, generate_count + 1):
-                prompt = PROMPT_BANK[(i - 1) % len(PROMPT_BANK)]
-                last_file = generate_conversation(prompt=prompt, turns=2, chat_num=i)
+            for i in range(start_index, start_index + generate_count):
+                prompt = PROMPT_BANK[(i - start_index) % len(PROMPT_BANK)]
+                last_file = generate_conversation(prompt=prompt, chat_num=i)
             with open(last_file, "r", encoding="utf-8") as f:
                 text = f.read()
             st.success(
@@ -71,14 +84,12 @@ if text:
 
     if analyze_btn:
         with st.spinner("Analyzing conversation..."):
-
             if mode == "Generate New Chat Logs":
                 tmp_file = "chat_logs/_temp_summary.txt"
                 with open(tmp_file, "w", encoding="utf-8") as f:
                     f.write(text)
                 file_to_analyze = tmp_file
-
-            elif mode == "Analyze Existing File":
+            else:
                 file_to_analyze = os.path.join("chat_logs", selected_file)
 
             summary_data = summarize_chat(file_to_analyze, use_tfidf)
@@ -89,7 +100,7 @@ if text:
                 - File: `{os.path.basename(summary_data['file'])}`  
                 - The conversation had **{summary_data['total']} exchanges**  
                 - User messages: **{summary_data['user']}**, AI messages: **{summary_data['ai']}**  
-                - Topic: **{summary_data['topic']}**  
-                - Top 5 keywords: {', '.join(summary_data['keywords'][:5])}  
+                - *{summary_data['topic']}* 
+                - Most Common keywords: {', '.join(summary_data['keywords'][:5])}  
                 """
             )

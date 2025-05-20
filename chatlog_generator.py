@@ -32,7 +32,10 @@ SYSTEM_PROMPT = {
 }
 
 
-def generate_conversation(prompt, turns=2, chat_num=1, output_dir="chat_logs"):
+def generate_conversation(prompt, turns=None, chat_num=1, output_dir="chat_logs"):
+    if turns is None:
+        turns = random.randint(1, 4)
+
     messages = [SYSTEM_PROMPT, {"role": "user", "content": prompt}]
     log = []
 
@@ -56,3 +59,11 @@ def generate_conversation(prompt, turns=2, chat_num=1, output_dir="chat_logs"):
     with open(file_path, "w", encoding="utf-8") as f:
         f.write("\n".join(log))
     return file_path
+
+
+def get_next_chat_number(output_dir="chat_logs"):
+    existing = [
+        f for f in os.listdir(output_dir) if f.startswith("chat") and f.endswith(".txt")
+    ]
+    existing_nums = [int(f[4:-4]) for f in existing if f[4:-4].isdigit()]
+    return max(existing_nums, default=0) + 1
