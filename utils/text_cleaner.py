@@ -2,19 +2,13 @@ import nltk
 import string
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from utils.nltk_setup import ensure_nltk_resources
 
 # nltk.download("punkt")
 # nltk.download("stopwords")
 
-try:
-    nltk.data.find("tokenizers/punkt")
-except LookupError:
-    nltk.download("punkt")
+ensure_nltk_resources()
 
-try:
-    nltk.data.find("corpora/stopwords")
-except LookupError:
-    nltk.download("stopwords")
 
 
 STOPWORDS = set(stopwords.words("english"))

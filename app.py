@@ -11,6 +11,7 @@ os.makedirs("chat_logs", exist_ok=True)
 # -----------------------------------Streamlit UI-----------------------------------
 st.title("🤖 AI Chat Log Summarizer")
 st.sidebar.header("Options")
+
 use_tfidf = st.sidebar.checkbox("Use TF-IDF", value=False)
 
 if st.sidebar.button("🗑 Delete All Chat Logs"):
