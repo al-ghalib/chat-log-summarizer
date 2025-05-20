@@ -44,10 +44,14 @@ This app generates short, verbal conversations between a user and an AI using th
 ## Installation
 
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/al-ghalib/chat-log-summarizer.git
+cd chat-log-summarizer
+````
+```bash
 python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
+venv\Scripts\activate 
+````
+```bash
 pip install -r requirements.txt
 ````
 

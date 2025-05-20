@@ -6,6 +6,8 @@ from summarizer.summarizer import summarize_chat
 
 load_dotenv()
 
+os.makedirs("chat_logs", exist_ok=True)
+
 # -----------------------------------Streamlit UI-----------------------------------
 st.title("🤖 AI Chat Log Summarizer")
 st.sidebar.header("Options")
@@ -35,18 +37,6 @@ if mode == "Generate New Chat Logs":
         "Generate N chat logs", min_value=1, max_value=20, step=1
     )
     generate_btn = st.sidebar.button("⚙️ Generate Chats")
-
-    # if generate_btn:
-    #     with st.spinner(f"Generating {generate_count} short chats..."):
-    #         last_file = ""
-    #         for i in range(1, generate_count + 1):
-    #             prompt = PROMPT_BANK[(i - 1) % len(PROMPT_BANK)]
-    #             last_file = generate_conversation(prompt=prompt, turns=2, chat_num=i)
-    #         with open(last_file, "r", encoding="utf-8") as f:
-    #             text = f.read()
-    #         st.success(
-    #             f"✅ {generate_count} chats generated. Showing: `{os.path.basename(last_file)}`"
-    #         )
 
     if generate_btn:
         with st.spinner(f"Generating {generate_count} short chats..."):
