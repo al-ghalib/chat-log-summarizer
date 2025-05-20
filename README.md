@@ -6,6 +6,13 @@ This app generates short, verbal conversations between a user and an AI using th
 
 ---
 
+## Preview
+
+![App Screenshot](screenshot.png)
+
+---
+
+
 ## Features
 
 - **Short conversation generation** using LLaMA 3 (via Groq API)
