@@ -2,7 +2,7 @@
 
 This app generates short, verbal conversations between a user and an AI using the Groq API (LLaMA 3 model) and summarizes them with NLP techniques and LLM-powered context understanding.
 
-🚀 **Live App**: [Click to open on Streamlit](https://your-username-your-repo-name.streamlit.app)
+🚀 **Live App**: [Click to open on Streamlit](https://al-ghalib-chat-log-summarizer-app-emvfaq.streamlit.app/)
 
 ---
 

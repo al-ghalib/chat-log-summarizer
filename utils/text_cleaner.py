@@ -10,7 +10,6 @@ from utils.nltk_setup import ensure_nltk_resources
 ensure_nltk_resources()
 
 
-
 STOPWORDS = set(stopwords.words("english"))
 
 

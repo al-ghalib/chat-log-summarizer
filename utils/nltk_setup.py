@@ -1,6 +1,5 @@
 import nltk
 
-
 def ensure_nltk_resources():
     for resource in ["punkt", "stopwords"]:
         try:
